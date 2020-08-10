@@ -79,8 +79,8 @@ class HomePage extends Component {
     return (
       <EmptyState
         image={<InsertBlockIllustration />}
-        title="RMUIF"
-        description="Supercharged version of Create React App with all the bells and whistles"
+        title="MRS Transport"
+        description="Booking app for Doctors Orders"
       />
     );
   }
