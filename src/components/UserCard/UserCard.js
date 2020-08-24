@@ -10,8 +10,7 @@ function UserCard(props) {
   return (
     <Card>
       <CardHeader
-        title={"Welcome " + `${user.firstName} ${user.lastName}`}
-        subheader={user.username}
+        title={"Welcome " + `${user.firstName} ${user.lastName}` + "!"}
       />
       <CardContent>
         <Typography variant="body2" component="p">
