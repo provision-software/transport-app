@@ -261,6 +261,7 @@ class AccountTab extends Component {
         firstName: "",
         lastName: "",
         username: "",
+        role: "",
         emailAddress: "",
         errors: null,
       },
@@ -494,6 +495,81 @@ class AccountTab extends Component {
     );
   };
 
+  changeRole = () => {
+    const { role } = this.state;
+
+    const errors = validate(
+      {
+        role: role,
+      },
+      {
+        role: constraints.role,
+      }
+    );
+
+    if (errors) {
+      this.setState({
+        errors: errors,
+      });
+
+      return;
+    }
+
+    this.setState(
+      {
+        errors: null,
+      },
+      () => {
+        const { userData } = this.props;
+
+        if (role === userData.role) {
+          return;
+        }
+
+        this.setState(
+          {
+            performingAction: true,
+          },
+          () => {
+            authentication
+              .changeRole(role)
+              .then(() => {
+                const { user, userData } = this.props;
+
+                this.setState(
+                  {
+                    profileCompletion: authentication.getProfileCompletion({
+                      ...user,
+                      ...userData,
+                    }),
+                  },
+                  () => {
+                    this.hideFields();
+                  }
+                );
+              })
+              .catch((reason) => {
+                const code = reason.code;
+                const message = reason.message;
+
+                switch (code) {
+                  default:
+                    this.props.openSnackbar(message);
+                    return;
+                }
+              })
+              .finally(() => {
+                this.setState({
+                  performingAction: false,
+                });
+              });
+          }
+        );
+      }
+    );
+  };
+
+
   changeEmailAddress = () => {
     const { emailAddress } = this.state;
 
@@ -619,6 +695,10 @@ class AccountTab extends Component {
         this.changeUsername();
         return;
 
+      case "role":
+        this.changeRole();
+        return;
+
       case "email-address":
         this.changeEmailAddress();
         return;
@@ -713,6 +793,18 @@ class AccountTab extends Component {
     });
   };
 
+  handleRoleChange = (event) => {
+    if (!event) {
+      return;
+    }
+
+    const role = event.target.value;
+
+    this.setState({
+      role: role,
+    });
+  };
+
   handleUsernameChange = (event) => {
     if (!event) {
       return;
@@ -758,6 +850,7 @@ class AccountTab extends Component {
       firstName,
       lastName,
       username,
+      role,
       emailAddress,
       sentVerificationEmail,
       errors,
@@ -766,6 +859,7 @@ class AccountTab extends Component {
     const hasFirstName = userData && userData.firstName;
     const hasLastName = userData && userData.lastName;
     const hasUsername = userData && userData.username;
+    const hasRole = userData && userData.role;
 
     return (
       <DialogContent classes={{ root: classes.dialogContent }}>

@@ -15,6 +15,7 @@ authentication.signUp = (fields) => {
     const firstName = fields.firstName;
     const lastName = fields.lastName;
     const username = fields.username;
+    const role = fields.role;
     const emailAddress = fields.emailAddress;
     const password = fields.password;
 
@@ -60,6 +61,7 @@ authentication.signUp = (fields) => {
             firstName: firstName,
             lastName: lastName,
             username: username,
+            role: role,
           })
           .then((value) => {
             analytics.logEvent("sign_up", {
@@ -724,6 +726,47 @@ authentication.changeUsername = (username) => {
       })
       .then((value) => {
         analytics.logEvent("change_username");
+
+        resolve(value);
+      })
+      .catch((reason) => {
+        reject(reason);
+      });
+  });
+};
+
+authentication.changeRole = (role) => {
+  return new Promise((resolve, reject) => {
+    if (!role) {
+      reject(new Error("No role"));
+
+      return;
+    }
+
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      reject(new Error("No current user"));
+
+      return;
+    }
+
+    const uid = currentUser.uid;
+
+    if (!uid) {
+      reject(new Error("No UID"));
+
+      return;
+    }
+
+    const userDocumentReference = firestore.collection("users").doc(uid);
+
+    userDocumentReference
+      .update({
+        role: role,
+      })
+      .then((value) => {
+        analytics.logEvent("change_role");
 
         resolve(value);
       })
